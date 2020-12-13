@@ -8,7 +8,8 @@
   ],
   "scripts": {
     "build": "rollup --config rollup.config.js",
-    "build:watch": "rollup --config rollup.config.js --watch"
+    "build:watch": "rollup --config rollup.config.js --watch",
+    "npm:publish": "npm publish --access public"
   },
   "dependencies": {},
   "devDependencies": {
