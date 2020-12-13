@@ -1,7 +1,12 @@
 {
   "name": "@jayrchamp/parse-query",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "",
+  "author": "jayrchamp <champjr@me.com>",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/jayrchamp/parse-query"
+  },
   "main": "dist/parseQuery.umd.min.js",
   "files": [
     "dist/*"
