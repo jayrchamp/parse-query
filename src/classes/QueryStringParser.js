@@ -186,14 +186,35 @@ class QueryStringParser {
    * @param {*} value 
    * @param {*} key 
    */
-  _validateType (typeFn, value, key) {    
-    const hasSameType = typeof typeFn === 'function' && typeof typeFn() === typeof value
+  _validateType (typeFn, value, key) {
+    const correctTypeFn = isArray(typeFn)
+      ? typeFn.every(t => typeof t === 'function') 
+      : typeof typeFn === 'function'
+
+    if (!correctTypeFn) {
+      this.errors.push({
+        prop: key,
+        action: 'removed from query',
+        method: '_validateType',
+        message: `type property of query option "${key}" should be either a native type function (ex.:  Number ) or an array of native type functions (ex.: [String, Number] )`
+      })
+    }
+
+    const hasSameType = isArray(typeFn)
+      ? typeFn.some(type => typeof type() === typeof value)
+      : typeof typeFn() === typeof value 
+
     if (hasSameType) return true
+
+    const ofType = isArray(typeFn) 
+      ? `${typeFn.map(t => typeof t()).join(', ')}`
+      : `${typeof typeFn()}`
+
     this.errors.push({
       prop: key,
       action: 'removed from query',
       method: '_validateType',
-      message: `query string "${key}" should be of type "${typeof typeFn()}", received "${typeof value}"`
+      message: `query string "${key}" should be of type "${ofType}", received "${typeof value}"`
     })
     return false
   }
