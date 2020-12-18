@@ -1,6 +1,6 @@
 {
   "name": "@jayrchamp/parse-query",
-  "version": "1.0.2",
+  "version": "1.1.0",
   "description": "",
   "author": "jayrchamp <champjr@me.com>",
   "repository": {
@@ -35,5 +35,8 @@
   },
   "engines": {
     "node": ">=10"
+  },
+  "mah": {
+    "repo": "jayrchamp/parse-query"
   }
 }
