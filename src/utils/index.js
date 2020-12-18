@@ -15,3 +15,13 @@ export const size  = (item) => {
 }
 
 export const hasProp = (item, prop) => isFilledObject(item) && item.hasOwnProperty(prop)
+
+export const getType = (typeFn) => {
+  if (typeof typeFn !== 'function') {
+    return typeof typeFn
+  }
+  if (typeof typeFn() === 'object' && isArray(typeFn())) {
+    return 'array'
+  } 
+  return typeof typeFn()
+}

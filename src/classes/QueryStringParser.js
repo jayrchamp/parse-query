@@ -2,7 +2,7 @@ import has from 'lodash/has'
 import get from 'lodash/get'
 import reduce from 'lodash/reduce'
 import isEmpty from 'lodash/isEmpty'
-import { isPlainObject, isArray, isFilledObject } from '../utils'
+import { isPlainObject, isArray, isFilledObject, getType } from '../utils'
 
 class QueryStringParser {
   constructor (routeQuery, queryOptions, ctx, options) {
@@ -113,16 +113,21 @@ class QueryStringParser {
    * @param {*} queryOptions 
    */
   _parseArray (prop, result, query, routeQuery, queryOptions) {
-    // console.log('\n')
-    // console.log('isArray');
-    console.warn('[QueryStringParser] - Query options of type "Array" are not supported yet.');
-    // const { _type, _validate, ...rest } = queryOptions[prop]
-    // routeQuery[prop].forEach((v, i) => {
-    //   if (_validate(v, ctx)) {
-    //     result[prop] = (result[prop] || [])
-    //     result[prop].push(v)
-    //   }
-    // })
+    const { _type, _validate, _key,  ...rest } = queryOptions[prop]
+    const value = get(routeQuery, prop)
+    value.forEach((v, i) => {
+      if (_validate(v, this.ctx)) {
+        result[prop] = (result[prop] || [])
+        result[prop].push(v)
+      } else {
+        this.errors.push({
+          prop: _key,
+          action: 'removed from query',
+          method: '_parseArray',
+          message: `value "${v}" of "${_key}" has failed validation from query option`
+        })
+      }
+    })
   }
 
   /**
@@ -207,9 +212,9 @@ class QueryStringParser {
     if (hasSameType) return true
 
     const ofType = isArray(typeFn) 
-      ? `${typeFn.map(t => typeof t()).join(', ')}`
-      : `${typeof typeFn()}`
-
+      ? `${typeFn.map(t => getType(t)).join(', ')}`
+      : getType(typeFn)
+      
     this.errors.push({
       prop: key,
       action: 'removed from query',
@@ -279,7 +284,8 @@ class QueryStringParser {
         r[k] = v
       } else {
         this.errors.push({
-          prop: `${key}.${k}`,
+          prop: key,
+          child: k,
           action: 'removed from query',
           method: '_validateObjectProps',
           message: `Validate function from query option failed for prop "${k}" in ${key}`
