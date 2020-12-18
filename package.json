@@ -12,9 +12,9 @@
     "dist/*"
   ],
   "scripts": {
+    "dev": "rollup --config rollup.config.js --watch",
     "build": "rollup --config rollup.config.js",
-    "build:watch": "rollup --config rollup.config.js --watch",
-    "npm:publish": "npm publish --access public"
+    "npm:publish": "npm publish --access public",
   },
   "dependencies": {},
   "devDependencies": {
