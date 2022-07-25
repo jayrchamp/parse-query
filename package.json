@@ -14,6 +14,8 @@
   "scripts": {
     "dev": "rollup --config rollup.config.js --watch",
     "build": "rollup --config rollup.config.js",
+    "test": "yarn build && jest",
+    "test:verbose": "yarn build && jest --verbose",
     "npm:publish": "npm publish --access public",
     "mah": "./node_modules/.bin/mah"
   },
@@ -31,7 +33,11 @@
     "rollup": "^2.34.2",
     "rollup-plugin-babel": "^4.4.0",
     "rollup-plugin-sizes": "^1.0.3",
-    "rollup-plugin-terser": "^7.0.2"
+    "rollup-plugin-terser": "^7.0.2",
+    "jest": "^26.6.3",
+    "moment-timezone": "^0.5.32",
+    "nodemon": "^2.0.6",
+    "qs": "^6.9.4"
   },
   "engines": {
     "node": ">=10"
