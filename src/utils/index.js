@@ -18,6 +18,13 @@ export const hasProp = (item, prop) => isFilledObject(item) && item.hasOwnProper
 
 export const getType = (typeFn) => {
   if (typeof typeFn !== 'function') {
+
+    if (typeof typeFn === 'object' && isArray(typeFn)) {
+      return 'array'
+    } else if (typeof typeFn === 'object') {
+      return 'object'
+    }
+
     return typeof typeFn
   }
   if (typeof typeFn() === 'object' && isArray(typeFn())) {
