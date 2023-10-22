@@ -1,8 +1,11 @@
 import has from 'lodash/has'
 import get from 'lodash/get'
+import set from 'lodash/set'
+import size from 'lodash/size'
 import reduce from 'lodash/reduce'
 import isEmpty from 'lodash/isEmpty'
-import { isPlainObject, isArray, isFilledObject, getType } from '../utils'
+import forEach from 'lodash/forEach'
+import { isPlainObject, isArray, isFilledObject, isNumber, getType } from '../utils'
 
 class QueryStringParser {
   constructor (routeQuery, queryOptions, ctx, options) {
@@ -38,24 +41,47 @@ class QueryStringParser {
    */
   _recursivelyParse (routeQuery, queryOptions, query = {}, parentKey = '') {
     if (isFilledObject(routeQuery)) {
-      query = Object.keys(routeQuery).reduce((result, prop, i) => {
+      query = this._recursivelyParseObject(routeQuery, queryOptions, query, parentKey)
+    } 
+    // else if (isArray(routeQuery)) {
 
-        const isValidProp = this._validateProp(routeQuery, queryOptions, prop, parentKey)
-        if (!isValidProp) return result
+    //   if (!query[parentKey]) {
+    //     query = []
+    //   }
 
-        if (isPlainObject(routeQuery[prop])) {
-          this._parseObject(prop, result, query, routeQuery, queryOptions)
-        } else if (isArray(routeQuery[prop])) {
-          this._parseArray(prop, result, query, routeQuery, queryOptions)
-        } else {
-          this._parseLiteral(prop, result, query, routeQuery, queryOptions)
-        } 
-
-        return result
-      }, {})
-    }
+    //   forEach(routeQuery, (o, i) => {
+    //     query[i] = this._recursivelyParse(o, queryOptions, query, parentKey + '.' + i)
+    //   })
+    // }
 
     return query
+  }
+
+  _recursivelyParseObject (routeQuery, queryOptions, query = {}, parentKey = '') {
+    return Object.keys(routeQuery).reduce((result, prop, i) => {
+      // console.log('\n')
+      // console.log( prop )
+
+
+      const isValidProp = this._validateProp(routeQuery, queryOptions, prop, parentKey)
+
+      // console.log( 
+      //   'isValidProp', isValidProp
+      //  )
+      // console.log('\n')
+
+      if (!isValidProp) return result
+
+      if (isPlainObject(routeQuery[prop])) {
+        this._parseObject(prop, result, query, routeQuery, queryOptions)
+      } else if (isArray(routeQuery[prop])) {
+        this._parseArray(prop, parentKey, result, query, routeQuery, queryOptions)
+      } else {
+        this._parseLiteral(prop, parentKey, result, query, routeQuery, queryOptions)
+      } 
+
+      return result
+    }, {})
   }
 
   /**
@@ -80,6 +106,12 @@ class QueryStringParser {
      * query option item object.
      */
     const validProps = this._validateObjectProps(_validate, value, _key)
+
+    // console.log('\n')
+    // console.log( 
+    //   'validProps', _key, validProps
+    //  )
+    // console.log('\n')
 
     /**
      * Recursively parse props in current route query object
@@ -112,22 +144,101 @@ class QueryStringParser {
    * @param {*} routeQuery 
    * @param {*} queryOptions 
    */
-  _parseArray (prop, result, query, routeQuery, queryOptions) {
+  _parseArray (prop, queryKey, result, query, routeQuery, queryOptions) {
     const { _type, _validate, _key,  ...rest } = queryOptions[prop]
+        
     const value = get(routeQuery, prop)
-    value.forEach((v, i) => {
-      if (_validate(v, this.ctx)) {
-        result[prop] = (result[prop] || [])
-        result[prop].push(v)
-      } else {
-        this.errors.push({
-          prop: _key,
-          action: 'removed from query',
-          method: '_parseArray',
-          message: `value "${v}" of "${_key}" has failed validation from query option`
-        })
+
+    const isValidType = this._validateType(_type, value, _key)
+    if (!isValidType) return
+
+    if (!rest['*']) {
+      this.errors.push({
+        prop: _key,
+        action: 'removed from query',
+        method: '_parseArray',
+        message: `query rule "${_key}.*" is missing`
+      })
+      return
+    }
+
+    /**
+     * Ensure 
+     */
+    // if (!this._validateType(_type, value, rest['*']._key)) {
+    //   this.errors.push({
+    //     prop: rest['*']._key,
+    //     action: 'removed from query',
+    //     method: '_parseArray',
+    //     message: `value type of items in query string "${_key}.*" should be array`
+    //   })
+    //   return
+    // }
+  
+
+
+
+
+    let _result = []
+
+    forEach(value, (o, i) => {
+      if (isPlainObject(o)) {
+        const obj = this._recursivelyParse(o, rest['*'], query, `${queryKey}.${prop}.${i}`)
+        if (size(obj) > 0) {
+          _result.push(obj)
+        }
+      }  
+      else if (isArray(o)) {
+        // this._parseArray(prop, parentKey, result, query, routeQuery, queryOptions)
+      } 
+      else {
+        const { 
+          _type: __type, 
+          _validate: __validate, 
+          _strict: __strict, 
+          _key: __key, 
+          ..._rest
+        } = rest['*']
+
+        let _value = get(routeQuery, prop + '.' + i)
+    
+        const isValidType = this._validateType(__type, _value, `${queryKey}.${prop}.${i}`)
+        if (!isValidType) return
+    
+        const isValid = this._validateCustom(__validate, _value, `${queryKey}.${prop}.${i}`)
+        if (!isValid) return
+        
+        if (typeof __type === 'function') {
+          _value = __type(_value)
+        }
+        
+        set(routeQuery, prop + '.' + i, _value)
+
+        _result.push(_value)
       }
     })
+
+    /**
+     * If current route query object end up being empty, don't 
+     * return since it won't be part of the valid query strings
+     */
+    if (isEmpty(_result)) {
+      this.errors.push({
+        prop: _key,
+        action: 'removed from query',
+        method: '_parseObject',
+        message: `"${_key}" is empty`
+      })
+      return
+    }
+    
+    /**
+     * Trigger the custom validate function under query rule, if any,
+     */
+    const isValid = this._validateCustom(_validate, _result, _key)
+    if (!isValid) return
+    
+    result[prop] = _result
   }
 
   /**
@@ -139,16 +250,22 @@ class QueryStringParser {
    * @param {*} routeQuery 
    * @param {*} queryOptions 
    */
-  _parseLiteral (prop, result, query, routeQuery, queryOptions) {
+  _parseLiteral (prop, key, result, query, routeQuery, queryOptions) {
     const { _type, _validate, _strict, _key, ...rest } = get(queryOptions, prop)
 
-    const value = get(routeQuery, prop)
-    
+    let value = get(routeQuery, prop)
+
     const isValidType = this._validateType(_type, value, _key)
     if (!isValidType) return
 
     const isValid = this._validateCustom(_validate, value, _key)
     if (!isValid) return
+
+    if (typeof _type === 'function') {
+      value = _type(value)
+    }
+
+    set(routeQuery, prop, value)
 
     result[prop] = value
   }
@@ -193,8 +310,9 @@ class QueryStringParser {
    */
   _validateType (typeFn, value, key) {
     const correctTypeFn = isArray(typeFn)
-      ? typeFn.every(t => typeof t === 'function') 
-      : typeof typeFn === 'function'
+    ? typeFn.every(t => typeof t === 'function' || (t === Number && isNumber(value)))
+    : typeof typeFn === 'function' || (typeFn === Number && isNumber(value));
+  
 
     if (!correctTypeFn) {
       this.errors.push({
@@ -205,21 +323,22 @@ class QueryStringParser {
       })
     }
 
+    // Update hasSameType to handle string numbers
     const hasSameType = isArray(typeFn)
-      ? typeFn.some(type => typeof type() === typeof value)
-      : typeof typeFn() === typeof value 
+      ? typeFn.some(type => (typeof type() === typeof value) || (type === Number && isNumber(value)))
+      : (typeof typeFn() === typeof value) || (typeFn === Number && isNumber(value));
 
-    if (hasSameType) return true
+    if (hasSameType) return true;
 
     const ofType = isArray(typeFn) 
       ? `${typeFn.map(t => getType(t)).join(', ')}`
       : getType(typeFn)
-      
+
     this.errors.push({
       prop: key,
       action: 'removed from query',
       method: '_validateType',
-      message: `query string "${key}" should be of type "${ofType}", received "${typeof value}"`
+      message: `Type validation failed on "${key}". It's value should be "${ofType}", but received "${getType(value)}"`
     })
     return false
   }
@@ -237,6 +356,7 @@ class QueryStringParser {
     }
 
     const isValid = validateFn(value, this.ctx)
+
     if (typeof isValid !== 'boolean') {
       this.errors.push({
         prop: key,

@@ -32,3 +32,13 @@ export const getType = (typeFn) => {
   } 
   return typeof typeFn()
 }
+
+export const isNumber = (value) => {
+  if (typeof value === 'number') {
+    return true;
+  } else if (typeof value === 'string') {
+    // Check if the string is a valid representation of a number
+    return !isNaN(value) && !isNaN(parseFloat(value));
+  }
+  return false;
+}

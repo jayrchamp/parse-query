@@ -1,4 +1,4 @@
-// const parseQueryStrings = require('/Users/xjr/Desktop/@jayrchamp/parse-query/dist/parseQuery.umd.js')
+// const parseQueryStrings = require('../dist/parseQuery.umd')
 // const parseQueryStrings = require('@jayrchamp/parse-query')
 const parseQueryStrings = require('../dist/parseQuery.umd.min.js')
 
@@ -64,7 +64,7 @@ describe('global', () => {
         prop: 'filters',
         action: 'removed from query',
         method: '_validateType',
-        message: `value query string "filters" should be of type "string", received "object"`
+        message: `Type validation failed on query string "filters". It's value should be "string", but received "object"`
       }
     ]);
   });
@@ -155,9 +155,12 @@ describe('global', () => {
           }
         },
         'filters.professionalIds': {
-          type: Array,
+          type: Array
+        },
+        'filters.professionalIds.*': {
+          type: Number,
           validate: (value, { store }) => 
-          store.professionalIds.indexOf(Number(value)) >= 0
+          store.professionalIds.indexOf(String(value)) >= 0
         }
       }
   
@@ -169,7 +172,7 @@ describe('global', () => {
   
       const context = {
         store: {
-          professionalIds: [1,2,3,4,5]
+          professionalIds: ['1','2','3','4','5']
         }
       }
   
@@ -189,8 +192,12 @@ describe('global', () => {
             ].indexOf(value) >= 0
           }
         },
+    
         'filters.professionalIds': {
-          type: Array,
+          type: Array
+        },
+        'filters.professionalIds.*': {
+          type: Number,
           validate: (value, { store }) => 
           store.professionalIds.indexOf(String(value)) >= 0
         }
@@ -225,7 +232,10 @@ describe('global', () => {
           }
         },
         'filters.professionalIds': {
-          type: Array,
+          type: Array
+        },
+        'filters.professionalIds.*': {
+          type: Number,
           validate: (value, { store }) => 
           store.professionalIds.indexOf(String(value)) >= 0
         }
@@ -245,31 +255,42 @@ describe('global', () => {
   
       const obj = parseQueryStrings(routeQuery, queryOptions, context)
 
+      // console.log('\n')
+      // console.log(require('util').inspect(
+      //   obj.query
+      // , false, null, true))
+      // console.log('\n')
+
+      // console.log(obj.errors);
+
       expect(obj.query).toEqual({
         filters: {
           professionalIds: [1, 2, 3, 4, 5]
         }
       });
       expect(obj.isValid).toBe(false);
-      expect(obj.errors).toEqual([
-        { 
-          prop: 'filters.professionalIds',
-          action: 'removed from query',
-          method: '_parseArray',
-          message: 'value "6" of "filters.professionalIds" has failed validation from query option' 
-        },
-        { prop: 'filters.professionalIds',
-          action: 'removed from query',
-          method: '_parseArray',
-          message: 'value "7" of "filters.professionalIds" has failed validation from query option' 
-        },
-        { 
-          prop: 'filters.professionalIds',
-          action: 'removed from query',
-          method: '_parseArray',
-          message: 'value "8" of "filters.professionalIds" has failed validation from query option' 
-        } 
-      ]);
+      expect(obj.errors).toEqual(
+        [
+          {
+            prop: 'filters.professionalIds.5',
+            action: 'removed from query',
+            method: '_validateCustom',
+            message: 'Validate function under filters.professionalIds.5 query rule has failed'
+          },
+          {
+            prop: 'filters.professionalIds.6',
+            action: 'removed from query',
+            method: '_validateCustom',
+            message: 'Validate function under filters.professionalIds.6 query rule has failed'
+          },
+          {
+            prop: 'filters.professionalIds.7',
+            action: 'removed from query',
+            method: '_validateCustom',
+            message: 'Validate function under filters.professionalIds.7 query rule has failed'
+          }
+        ]
+      );
     });
   })
 });
