@@ -310,8 +310,8 @@ class QueryStringParser {
    */
   _validateType (typeFn, value, key) {
     const correctTypeFn = isArray(typeFn)
-    ? typeFn.every(t => typeof t === 'function' || (t === Number && isNumber(value)))
-    : typeof typeFn === 'function' || (typeFn === Number && isNumber(value));
+    ? typeFn.every(t => typeof t === 'function' || (t.toString() === Number.toString() && isNumber(value)))
+    : typeof typeFn === 'function' || (typeFn.toString() === Number.toString() && isNumber(value));
   
 
     if (!correctTypeFn) {
@@ -325,8 +325,8 @@ class QueryStringParser {
 
     // Update hasSameType to handle string numbers
     const hasSameType = isArray(typeFn)
-      ? typeFn.some(type => (typeof type() === typeof value) || (type === Number && isNumber(value)))
-      : (typeof typeFn() === typeof value) || (typeFn === Number && isNumber(value));
+      ? typeFn.some(type => (typeof type() === typeof value) || (type.toString() === Number.toString() && isNumber(value)))
+      : (typeof typeFn() === typeof value) || (typeFn.toString() === Number.toString() && isNumber(value));
 
     if (hasSameType) return true;
 
