@@ -17,9 +17,9 @@ describe("filters.questionsCount w/ correctly set queryOptions ", function() {
     'filters.questionsCount': {
       type: Object,
       validate: (value) => {
-        console.log('\n')
-        console.log('questionsCount', value )
-        console.log('\n')
+        // console.log('\n')
+        // console.log('questionsCount', value )
+        // console.log('\n')
         return [
           'min',
           'max'
@@ -29,9 +29,9 @@ describe("filters.questionsCount w/ correctly set queryOptions ", function() {
     'filters.questionsCount.min': {
       type: [String, Number],
       validate: (value, { app, route }) => {
-        console.log('\n')
-        console.log('min', value )
-        console.log('\n')
+        // console.log('\n')
+        // console.log('min', value )
+        // console.log('\n')
         let max = app.$_.get(route, 'query.filters.questionsCount.max')
         max = Number(max)
         let min = Number(value)
@@ -45,9 +45,9 @@ describe("filters.questionsCount w/ correctly set queryOptions ", function() {
     'filters.questionsCount.max': {
       type: [String, Number],
       validate: (value, { app, route}) => {
-        console.log('\n')
-        console.log('max', value )
-        console.log('\n')
+        // console.log('\n')
+        // console.log('max', value )
+        // console.log('\n')
         let min = app.$_.get(route, 'query.filters.questionsCount.min')
         min = Number(min)
         let max = Number(value)
@@ -83,7 +83,7 @@ describe("filters.questionsCount w/ correctly set queryOptions ", function() {
     }
   
     const obj = parseQueryStrings(routeQuery, queryOptions, context)
-    console.log(obj);
+    // console.log(obj);
   
     expect(obj.query).toEqual(routeQuery);
     // expect(obj.isValid).toBe(true);
