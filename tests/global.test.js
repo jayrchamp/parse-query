@@ -64,7 +64,7 @@ describe('global', () => {
         prop: 'filters',
         action: 'removed from query',
         method: '_validateType',
-        message: `query string "filters" should be of type "string", received "object"`
+        message: `value query string "filters" should be of type "string", received "object"`
       }
     ]);
   });
@@ -102,7 +102,7 @@ describe('global', () => {
         prop: 'filters.type',
         action: 'removed from query',
         method: '_validateCustom',
-        message: 'Validate function from query option should return a boolean'
+        message: 'Validate function under filters.type query rule should return a boolean'
       },
       { 
         prop: 'filters',

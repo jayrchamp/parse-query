@@ -242,7 +242,7 @@ class QueryStringParser {
         prop: key,
         action: 'removed from query',
         method: '_validateCustom',
-        message: 'Validate function from query option should return a boolean'
+        message: `Validate function under ${key} query rule should return a boolean`
       })
       return false
     }
@@ -252,7 +252,7 @@ class QueryStringParser {
         prop: key,
         action: 'removed from query',
         method: '_validateCustom',
-        message: 'Validate function from query option has failed'
+        message: `Validate function under ${key} query rule has failed`
       })
       return false
     }
@@ -279,7 +279,9 @@ class QueryStringParser {
      * of current object and simply remove them if are invalid
      */
     let obj = reduce(value, (r, v, k) => {
+
       const isValid = validateFn(k, this.ctx)
+
       if (isValid) {
         r[k] = v
       } else {
@@ -288,7 +290,7 @@ class QueryStringParser {
           child: k,
           action: 'removed from query',
           method: '_validateObjectProps',
-          message: `Validate function from query option failed for prop "${k}" in ${key}`
+          message: `Validate function under ${key} query rule has failed. "${k}" property is not allowed within "${key}" object in the query string`
         })
       }
       return r
