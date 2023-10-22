@@ -64,7 +64,7 @@ describe('global', () => {
         prop: 'filters',
         action: 'removed from query',
         method: '_validateType',
-        message: `Type validation failed on query string "filters". It's value should be "string", but received "object"`
+        message: `Type validation failed on "filters". It's value should be "string", but received "object"`
       }
     ]);
   });
