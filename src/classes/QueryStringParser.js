@@ -205,13 +205,13 @@ class QueryStringParser {
         const isValidType = this._validateType(__type, _value, `${queryKey}.${prop}.${i}`)
         if (!isValidType) return
     
-        const isValid = this._validateCustom(__validate, _value, `${queryKey}.${prop}.${i}`)
-        if (!isValid) return
-        
         if (typeof __type === 'function') {
           _value = __type(_value)
         }
-        
+
+        const isValid = this._validateCustom(__validate, _value, `${queryKey}.${prop}.${i}`)
+        if (!isValid) return
+                
         set(routeQuery, prop + '.' + i, _value)
 
         _result.push(_value)
@@ -258,12 +258,12 @@ class QueryStringParser {
     const isValidType = this._validateType(_type, value, _key)
     if (!isValidType) return
 
-    const isValid = this._validateCustom(_validate, value, _key)
-    if (!isValid) return
-
     if (typeof _type === 'function') {
       value = _type(value)
     }
+
+    const isValid = this._validateCustom(_validate, value, _key)
+    if (!isValid) return
 
     set(routeQuery, prop, value)
 
