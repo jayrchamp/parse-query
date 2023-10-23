@@ -589,7 +589,7 @@ describe('context passed to query option validators', () => {
         type: Object,
         validate: (value) => {
           return [
-            'delayId'
+            'delayIds'
           ].indexOf(value) >= 0
         }
       },
@@ -730,6 +730,83 @@ describe('context passed to query option validators', () => {
         }
       ]
     );
+  });
+
+
+  it(`should trigger all custom validate functions`, function() {
+
+    let validate1 = null
+    let validate2 = null
+    let validate3 = null
+
+    const queryRules = {
+      filters: {
+        type: Object,
+        validate: (value) => {
+          return [
+            '$and'
+          ].indexOf(value) >= 0
+        }
+      },
+      'filters.$and': {
+        type: Array
+      },
+
+      'filters.$and.*': {
+        type: Object,
+        validate: (value) => {
+          validate1 = value
+          return [
+            'delayIds'
+          ].indexOf(value) >= 0
+        }
+      },
+
+      'filters.$and.*.delayIds': {
+        type: Object,
+        validate: (value) => {
+          validate2 = value
+          return [
+            '$eq'
+          ].indexOf(value) >= 0
+        }
+      },
+
+      'filters.$and.*.delayIds.$eq': {
+        type: Number,
+        validate: (value) => {
+          validate3 = value
+          return true
+        }
+      }
+    }
+
+    const routeQuery = {
+      filters: {
+        $and: [ 
+          {
+            delayIds: {
+              $eq: 1
+            }
+          }
+        ]
+      }
+    }
+
+    const obj = parseQuery(routeQuery, queryRules)
+
+    expect(validate1).toEqual('delayIds')
+    expect(validate2).toEqual('$eq')
+    expect(validate3).toEqual(1)
+    expect(obj.query).toEqual(
+      {
+        filters: {
+          '$and': [ { delayIds: { '$eq': 1 } } ]
+        }
+      }
+    );
+    expect(obj.isValid).toBe(true);
+    expect(obj.errors).toEqual([]);
   });
 
   // it(`should ..`, function() {

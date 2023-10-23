@@ -107,12 +107,6 @@ class QueryStringParser {
      */
     const validProps = this._validateObjectProps(_validate, value, _key)
 
-    // console.log('\n')
-    // console.log( 
-    //   'validProps', _key, validProps
-    //  )
-    // console.log('\n')
-
     /**
      * Recursively parse props in current route query object
      */
@@ -183,7 +177,9 @@ class QueryStringParser {
 
     forEach(value, (o, i) => {
       if (isPlainObject(o)) {
-        const obj = this._recursivelyParse(o, rest['*'], query, `${queryKey}.${prop}.${i}`)
+        const validProps = this._validateObjectProps(rest['*']._validate, o, rest['*']._key)
+
+        const obj = this._recursivelyParse(validProps, rest['*'], query, `${queryKey}.${prop}.${i}`)
         if (size(obj) > 0) {
           _result.push(obj)
         }
