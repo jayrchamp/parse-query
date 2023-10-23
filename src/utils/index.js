@@ -42,3 +42,5 @@ export const isNumber = (value) => {
   }
   return false;
 }
+
+export const isNativeNumberFn = (fn) => fn('') === 0 && fn(null) === 0 && isNaN(fn(undefined)) && fn('123') === 123;

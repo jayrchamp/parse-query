@@ -732,6 +732,62 @@ describe('context passed to query option validators', () => {
     );
   });
 
+  // it(`should ..`, function() {
+
+  //   const queryRules = {
+  //     filters: {
+  //       type: Object,
+  //       validate: (value) => {
+  //         return [
+  //           '$and'
+  //         ].indexOf(value) >= 0
+  //       }
+  //     },
+  //     'filters.$and': {
+  //       type: Array,
+  //       validate: (value) => {
+  //         return true
+  //       }
+  //     },
+  //     'filters.$and.*': {
+  //       type: Number
+  //     }
+  //   }
+
+  //   const routeQuery = {
+  //     filters: {
+  //       $and: ['1']
+  //     }
+  //   }
+
+
+  //   const obj = parseQuery(routeQuery, queryRules)
+
+  //   // console.log('\n')
+  //   // console.log( obj.errors )
+  //   // console.log('\n')
+
+  //   // expect(obj.query).toEqual({});
+  //   // expect(obj.isValid).toBe(false);
+  //   // expect(obj.errors).toEqual(
+  //   //   [
+  //   //     {
+  //   //       prop: 'filters.$and',
+  //   //       action: 'removed from query',
+  //   //       method: '_validateType',
+  //   //       message: `Type validation failed on query string "filters.$and". It's value should be "array", but received "number"`
+  //   //     },
+  //   //     {
+  //   //       prop: 'filters',
+  //   //       action: 'removed from query',
+  //   //       method: '_parseObject',
+  //   //       message: '"filters" is empty'
+  //   //     }
+  //   //   ]
+  //   // );
+
+  // });
+
 
   // it(`should ...`, function() {
 
