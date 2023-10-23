@@ -8,6 +8,13 @@
     "url": "https://github.com/jayrchamp/parse-query"
   },
   "main": "dist/parseQuery.umd.min.js",
+  "module": "dist/parseQuery.esm.min.js",
+  "exports": {
+    ".": {
+      "import": "./dist/parseQuery.esm.min.js",
+      "require": "./dist/parseQuery.umd.min.js"
+    }
+  },
   "files": [
     "dist/*"
   ],
