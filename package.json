@@ -46,9 +46,6 @@
     "rollup-plugin-sizes": "^1.0.3",
     "rollup-plugin-terser": "^7.0.2"
   },
-  "engines": {
-    "node": "16.x.x"
-  },
   "mah": {
     "repo": "jayrchamp/parse-query"
   }
