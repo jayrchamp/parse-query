@@ -5,7 +5,7 @@ import size from 'lodash/size'
 import reduce from 'lodash/reduce'
 import isEmpty from 'lodash/isEmpty'
 import forEach from 'lodash/forEach'
-import { isPlainObject, isArray, isFilledObject, isNumber, isNativeNumberFn, getType } from '../utils'
+import { isPlainObject, isArray, isFilledObject, isNumber, isNativeNumberFn, isNativeArrayFn, getType } from '../utils'
 
 class QueryStringParser {
   constructor (routeQuery, queryOptions, ctx, options) {
@@ -305,7 +305,7 @@ class QueryStringParser {
    * @param {*} key 
    */
   _validateType (typeFn, value, key) {
-    const correctTypeFn = isArray(typeFn)
+    const correctTypeFn = isArray(typeFn) && !isNativeArrayFn(typeFn)
     ? typeFn.every(t => typeof t === 'function' || (isNativeNumberFn(t) && isNumber(value)))
     : typeof typeFn === 'function' || (isNativeNumberFn(typeFn) && isNumber(value));
   
@@ -320,13 +320,13 @@ class QueryStringParser {
     }
 
     // Update hasSameType to handle string numbers
-    const hasSameType = isArray(typeFn)
+    const hasSameType = isArray(typeFn) && !isNativeArrayFn(typeFn)
       ? typeFn.some(type => (typeof type() === typeof value) || (isNativeNumberFn(type) && isNumber(value)))
       : (typeof typeFn() === typeof value) || (isNativeNumberFn(typeFn) && isNumber(value));
 
     if (hasSameType) return true;
 
-    const ofType = isArray(typeFn) 
+    const ofType = isArray(typeFn) && !isNativeArrayFn(typeFn)
       ? `${typeFn.map(t => getType(t)).join(', ')}`
       : getType(typeFn)
 
