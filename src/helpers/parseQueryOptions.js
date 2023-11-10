@@ -8,19 +8,39 @@ const _ = {
   merge
 }
 
+function validateObjectKeys(obj) {
+  // Retrieve all the keys of the object
+  const keys = Object.keys(obj);
+  const validKeys = [];
 
-function parseQueryOptions (queryOptions) {
+  // Iterate over each key to check for validation
+  for (const key of keys) {
+    // Check if the key starts or ends with a dot
+    if (key.startsWith('.') || key.endsWith('.')) {
+      validKeys.push(key);
+    }
+  }
+
+  // Return true if all keys are valid
+  return validKeys;
+}
+
+
+function parseQueryOptions(queryOptions) {
   let options = {}
+
+  const invalidKeys = validateObjectKeys(queryOptions)
+  if (invalidKeys.length > 0) {
+    throw new Error(`[@jayrchamp/parse-query] Invalid query option keys: ${invalidKeys.join(' | ')}`)
+  }
+
   if (_.isPlainObject(queryOptions) && Object.keys(queryOptions).length > 0) {
     Object.keys(queryOptions).forEach(key => {
-      Object.keys(queryOptions)
-
-
       const queryOptionsItem = _.reduce(queryOptions[key], (result, v, k) => {
         result[`_${k}`] = v
         return result
       }, {})
-      
+
       queryOptionsItem['_key'] = key
 
       const keyParts = key.split('.')
