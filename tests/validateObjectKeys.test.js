@@ -23,7 +23,7 @@ describe('', () => {
           ].indexOf(value) >= 0
         }
       },
-      'filter.id.$in': {
+      'filter.id.$in.': {
         type: Array
       },
       'filter.id.$in.*': {
@@ -41,7 +41,7 @@ describe('', () => {
       }
     }
 
-    expect(() => parseQuery(routeQuery, queryRules)).toThrow("[@jayrchamp/parse-query] Invalid query option keys: filter.id.");
+    expect(() => parseQuery(routeQuery, queryRules)).toThrow("[@jayrchamp/parse-query] Invalid query option keys: ->  filter.id. | filter.id.$in.  <-");
   });
   
 });

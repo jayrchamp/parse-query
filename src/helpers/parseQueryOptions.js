@@ -31,7 +31,7 @@ function parseQueryOptions(queryOptions) {
 
   const invalidKeys = validateObjectKeys(queryOptions)
   if (invalidKeys.length > 0) {
-    throw new Error(`[@jayrchamp/parse-query] Invalid query option keys: ${invalidKeys.join(' | ')}`)
+    throw new Error(`[@jayrchamp/parse-query] Invalid query option keys: ->  ${invalidKeys.join(' | ')}  <-`)
   }
 
   if (_.isPlainObject(queryOptions) && Object.keys(queryOptions).length > 0) {
