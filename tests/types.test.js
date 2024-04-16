@@ -88,5 +88,61 @@ describe('', () => {
     expect(obj.errors).toEqual([]);
   });
 
+  it(`should parse the string value of route query and convert it to the defined type`, function() {
+    const queryOptions = {
+      filters: {
+        type: Object,
+        validate: (value) => {
+          return [
+            'age'
+          ].indexOf(value) >= 0
+        }
+      },
+      'filters.age': {
+        type: Object,
+        validate: (value) => {
+          return [
+            'max'
+          ].indexOf(value) >= 0
+        }
+      },
+      'filters.age.max': {
+        type: Number,
+        validate: (value, { app, route}) => {
+          return true
+        }
+      }
+    }
 
+    const routeQuery = {
+      filters: {
+        age: {
+          max: '120' // string value of 120 should be converted to a number
+        }
+      }
+    }
+
+    const context = {
+      store: {},
+      app: {
+        $_: _
+      },
+      route: {
+        query: routeQuery
+      }
+    }
+
+    const obj = parseQueryStrings(routeQuery, queryOptions, context)
+
+
+    expect(obj.query).toEqual({
+      filters: { 
+        age: { 
+          max: 120 
+        } 
+      }
+    });
+    expect(obj.isValid).toBe(true);
+    expect(obj.errors).toEqual([]);
+  });
 });

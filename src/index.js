@@ -11,7 +11,7 @@ export default (routeQuery, queryOptions, ctx = {}, options = {}) => {
   const errors = queryStringParser.getErrors()
   return {
     query,
-    isValid: size(deepDiff(query, routeQuery)) <= 0,
+    isValid: errors.length <= 0,
     errors
   }
 }
